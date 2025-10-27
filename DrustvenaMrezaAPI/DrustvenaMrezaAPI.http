@@ -1,0 +1,6 @@
+@DrustvenaMrezaAPI_HostAddress = http://localhost:5241
+
+GET {{DrustvenaMrezaAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
