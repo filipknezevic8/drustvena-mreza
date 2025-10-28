@@ -6,6 +6,7 @@ namespace DrustvenaMrezaAPI.Repositories
     public class GroupRepository
     {
         private const string filePath = "data/grupe.csv";
+        private const string membershipsFile = "data/clanstva.csv";
         public static Dictionary<int, Group> Data;
 
         public GroupRepository()
@@ -29,6 +30,19 @@ namespace DrustvenaMrezaAPI.Repositories
                 DateTime foundedDate = DateTime.ParseExact(parts[2], "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 Group group = new Group(id, name, foundedDate);
                 Data[id] = group;
+            }
+
+            string[] membershipLines = File.ReadAllLines(membershipsFile);
+            foreach (string line in membershipLines)
+            {
+                string[] parts = line.Split(',');
+                int userId = int.Parse(parts[0]);
+                int groupId = int.Parse(parts[1]);
+
+                if (Data.ContainsKey(groupId))
+                {
+                    Data[groupId].MemberIds.Add(userId);
+                }
             }
         }
 
