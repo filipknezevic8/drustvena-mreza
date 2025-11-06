@@ -73,6 +73,20 @@ namespace DrustvenaMrezaAPI.Controllers
             return Ok(user);
         }
 
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            if (!UserRepository.Data.ContainsKey(id))
+            {
+                return NotFound();
+            }
+
+            UserRepository.Data.Remove(id);
+            userRepository.Save();
+
+            return NoContent();
+        }
+
         private int CalculateNewId(List<int> ids)
         {
             if (ids.Count == 0) return 1;
