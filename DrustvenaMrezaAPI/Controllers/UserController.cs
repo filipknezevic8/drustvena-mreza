@@ -1,7 +1,9 @@
 ﻿using DrustvenaMrezaAPI.Models;
 using DrustvenaMrezaAPI.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 
 namespace DrustvenaMrezaAPI.Controllers
 {
@@ -15,7 +17,50 @@ namespace DrustvenaMrezaAPI.Controllers
         [HttpGet]
         public ActionResult<List<User>> GetAll()
         {
-            return Ok(UserRepository.Data.Values.ToList());
+            List<User> users = GetAllFromDatabase();
+            return Ok(users);
+        }
+
+        private static List<User> GetAllFromDatabase()
+        {
+            List<User> users = new List<User>();
+            try
+            {
+                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                connection.Open();
+
+                string query = "SELECT * FROM Users";
+                using SqliteCommand command = new SqliteCommand(query, connection);
+
+                using SqliteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    int Id = Convert.ToInt32(reader["Id"]);
+                    string Username = reader["Username"].ToString();
+                    string FirstName = reader["Name"].ToString();
+                    string LastName = reader["Surname"].ToString();
+                    DateTime BirthDate = Convert.ToDateTime(reader["Birthday"]);
+                    User user = new User(Id, Username, FirstName, LastName, BirthDate);
+                    users.Add(user);
+                }
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+            }
+            catch (FormatException ex)
+            {
+                Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Neočekivana greška: {ex.Message}");
+            }
+            return users;
         }
 
         [HttpGet("{id}")]
