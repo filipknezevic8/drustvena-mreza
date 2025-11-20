@@ -11,9 +11,6 @@ namespace DrustvenaMrezaAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private GroupRepository groupRepository = new GroupRepository();
-        private UserRepository userRepository = new UserRepository();
-
         private UserDbRepository userDbRepository;
 
         public UserController()
@@ -51,22 +48,12 @@ namespace DrustvenaMrezaAPI.Controllers
                 return BadRequest();
             }
 
-            int newId = CalculateNewId(UserRepository.Data.Keys.ToList());
-            newUser.Id = newId;
-            UserRepository.Data[newId] = newUser;
-            userRepository.Save();
-
-            return Ok(newUser);
+            return Ok(UserDbRepository.Create(newUser));
         }
 
         [HttpPut("{id}")]
         public ActionResult<User> Update(int id, [FromBody] User updatedUser)
         {
-            if (!UserRepository.Data.ContainsKey(id))
-            {
-                return NotFound();
-            }
-
             if (string.IsNullOrWhiteSpace(updatedUser.Username) ||
                 string.IsNullOrWhiteSpace(updatedUser.FirstName) ||
                 string.IsNullOrWhiteSpace(updatedUser.LastName))
@@ -74,35 +61,27 @@ namespace DrustvenaMrezaAPI.Controllers
                 return BadRequest();
             }
 
-            User user = UserRepository.Data[id];
-            user.Username = updatedUser.Username;
-            user.FirstName = updatedUser.FirstName;
-            user.LastName = updatedUser.LastName;
-            user.BirthDate = updatedUser.BirthDate;
+            bool result = UserDbRepository.Update(updatedUser);
 
-            userRepository.Save();
+            if (result == false)
+            {
+                return NotFound();
+            }
 
-            return Ok(user);
+            return Ok(updatedUser);
         }
 
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            if (!UserRepository.Data.ContainsKey(id))
+            bool result = UserDbRepository.Delete(id);
+
+            if (result == false)
             {
                 return NotFound();
             }
 
-            UserRepository.Data.Remove(id);
-            userRepository.Save();
-
             return NoContent();
-        }
-
-        private int CalculateNewId(List<int> ids)
-        {
-            if (ids.Count == 0) return 1;
-            return ids.Max() + 1;
         }
     }
 }

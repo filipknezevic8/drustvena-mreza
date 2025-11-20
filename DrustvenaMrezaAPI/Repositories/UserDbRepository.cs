@@ -1,4 +1,5 @@
-﻿using DrustvenaMrezaAPI.Models;
+﻿using System.Runtime.InteropServices;
+using DrustvenaMrezaAPI.Models;
 using Microsoft.Data.Sqlite;
 
 namespace DrustvenaMrezaAPI.Repositories
@@ -88,6 +89,109 @@ namespace DrustvenaMrezaAPI.Repositories
                 Console.WriteLine($"Neočekivana greška: {ex.Message}");
             }
             return null;
+        }
+
+        public static User Create (User user)
+        {
+            try
+            {
+                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                connection.Open();
+
+                string query = @"INSERT INTO Users (Username, Name, Surname, Birthday) VALUES (@Username, @Name, @Surname, @Birthday); SELECT LAST_INSERT_ROWID();";
+                using SqliteCommand command = new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@Username", user.Username);
+                command.Parameters.AddWithValue("@Name", user.FirstName);
+                command.Parameters.AddWithValue("@Surname", user.LastName);
+                command.Parameters.AddWithValue("@Birthday", user.BirthDate);
+                user.Id = Convert.ToInt32(command.ExecuteScalar());
+                return user;
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+            }
+            catch (FormatException ex)
+            {
+                Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Neočekivana greška: {ex.Message}");
+            }
+            return null;
+        }
+
+        public static bool Update (User user)
+        {
+            try
+            {
+                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                connection.Open();
+
+                string query = @"UPDATE Users SET Username = @Username, Name = @Name, Surname = @Surname, Birthday = @Birthday WHERE Id = @Id";
+                using SqliteCommand command = new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@Username", user.Username);
+                command.Parameters.AddWithValue("@Name", user.FirstName);
+                command.Parameters.AddWithValue("@Surname", user.LastName);
+                command.Parameters.AddWithValue("@Birthday", user.BirthDate);
+                command.Parameters.AddWithValue("@Id", user.Id);
+                int affectedRows = command.ExecuteNonQuery();
+                return affectedRows > 0;
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+            }
+            catch (FormatException ex)
+            {
+                Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Neočekivana greška: {ex.Message}");
+            }
+            return false;
+        }
+
+        public static bool Delete (int id)
+        {
+            try
+            {
+                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                connection.Open();
+
+                string query = @"DELETE FROM Users WHERE Id = @Id";
+                using SqliteCommand command = new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@Id", id);
+                int affectedRows = command.ExecuteNonQuery();
+                return affectedRows > 0;
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+            }
+            catch (FormatException ex)
+            {
+                Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Neočekivana greška: {ex.Message}");
+            }
+            return false;
         }
     }
 }
