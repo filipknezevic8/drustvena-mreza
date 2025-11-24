@@ -6,12 +6,19 @@ namespace DrustvenaMrezaAPI.Repositories
 {
     public class UserDbRepository
     {
-        public static List<User> GetAll()
+        private readonly string connectionString;
+
+        public UserDbRepository(IConfiguration configuration)
+        {
+            connectionString = configuration["ConnectionString:SQLiteConnection"];
+        }
+
+        public List<User> GetAll()
         {
             List<User> users = new List<User>();
             try
             {
-                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                using SqliteConnection connection = new SqliteConnection(connectionString);
                 connection.Open();
 
                 string query = "SELECT * FROM Users";
@@ -32,27 +39,31 @@ namespace DrustvenaMrezaAPI.Repositories
             catch (SqliteException ex)
             {
                 Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+                throw;
             }
             catch (FormatException ex)
             {
                 Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+                throw;
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Neočekivana greška: {ex.Message}");
+                throw;
             }
             return users;
         }
 
-        public static User GetById (int id)
+        public User GetById (int id)
         {
             try
             {
-                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                using SqliteConnection connection = new SqliteConnection(connectionString);
                 connection.Open();
 
                 string query = "SELECT * FROM Users WHERE Id = @Id";
@@ -75,27 +86,31 @@ namespace DrustvenaMrezaAPI.Repositories
             catch (SqliteException ex)
             {
                 Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+                throw;
             }
             catch (FormatException ex)
             {
                 Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+                throw;
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Neočekivana greška: {ex.Message}");
+                throw;
             }
             return null;
         }
 
-        public static User Create (User user)
+        public User Create (User user)
         {
             try
             {
-                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                using SqliteConnection connection = new SqliteConnection(connectionString);
                 connection.Open();
 
                 string query = @"INSERT INTO Users (Username, Name, Surname, Birthday) VALUES (@Username, @Name, @Surname, @Birthday); SELECT LAST_INSERT_ROWID();";
@@ -110,27 +125,30 @@ namespace DrustvenaMrezaAPI.Repositories
             catch (SqliteException ex)
             {
                 Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+                throw;
             }
             catch (FormatException ex)
             {
                 Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+                throw;
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Neočekivana greška: {ex.Message}");
+                throw;
             }
-            return null;
         }
 
-        public static bool Update (User user)
+        public bool Update (User user)
         {
             try
             {
-                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                using SqliteConnection connection = new SqliteConnection(connectionString);
                 connection.Open();
 
                 string query = @"UPDATE Users SET Username = @Username, Name = @Name, Surname = @Surname, Birthday = @Birthday WHERE Id = @Id";
@@ -146,27 +164,30 @@ namespace DrustvenaMrezaAPI.Repositories
             catch (SqliteException ex)
             {
                 Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+                throw;
             }
             catch (FormatException ex)
             {
                 Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+                throw;
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Neočekivana greška: {ex.Message}");
+                throw;
             }
-            return false;
         }
 
-        public static bool Delete (int id)
+        public bool Delete (int id)
         {
             try
             {
-                using SqliteConnection connection = new SqliteConnection("Data Source=database/korisnici-grupe.db");
+                using SqliteConnection connection = new SqliteConnection(connectionString);
                 connection.Open();
 
                 string query = @"DELETE FROM Users WHERE Id = @Id";
@@ -178,20 +199,23 @@ namespace DrustvenaMrezaAPI.Repositories
             catch (SqliteException ex)
             {
                 Console.WriteLine($"Greška pri konekciji ili izvršavanju neispravnih SQL upita: {ex.Message}");
+                throw;
             }
             catch (FormatException ex)
             {
                 Console.WriteLine($"Greška u konverziji podataka iz baze: {ex.Message}");
+                throw;
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"Konekcija nije otvorena ili je otvorena više puta: {ex.Message}");
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Neočekivana greška: {ex.Message}");
+                throw;
             }
-            return false;
         }
     }
 }

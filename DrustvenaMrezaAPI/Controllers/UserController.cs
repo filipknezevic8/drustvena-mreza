@@ -13,29 +13,43 @@ namespace DrustvenaMrezaAPI.Controllers
     {
         private UserDbRepository userDbRepository;
 
-        public UserController()
+        public UserController(IConfiguration configuration)
         {
-            userDbRepository = new UserDbRepository();
+            userDbRepository = new UserDbRepository(configuration);
         }
 
         [HttpGet]
         public ActionResult<List<User>> GetAll()
         {
-            List<User> users = UserDbRepository.GetAll();
-            return Ok(users);
+            try
+            {
+                List<User> users = userDbRepository.GetAll();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return Problem("An error occurred while fetching the users.");
+            }
         }
 
         [HttpGet("{id}")]
         public ActionResult<User> GetById(int id)
         {
-            User user = UserDbRepository.GetById(id);
-            
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                User user = userDbRepository.GetById(id);
 
-            return Ok(user);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return Problem("An error occurred while fetching the user.");
+            }
         }
 
         [HttpPost]
@@ -48,7 +62,14 @@ namespace DrustvenaMrezaAPI.Controllers
                 return BadRequest();
             }
 
-            return Ok(UserDbRepository.Create(newUser));
+            try
+            {
+                return Ok(userDbRepository.Create(newUser));
+            }
+            catch (Exception ex)
+            {
+                return Problem("An error occurred while creating the user.");
+            }
         }
 
         [HttpPut("{id}")]
@@ -61,27 +82,41 @@ namespace DrustvenaMrezaAPI.Controllers
                 return BadRequest();
             }
 
-            bool result = UserDbRepository.Update(updatedUser);
-
-            if (result == false)
+            try
             {
-                return NotFound();
-            }
+                bool result = userDbRepository.Update(updatedUser);
 
-            return Ok(updatedUser);
+                if (result == false)
+                {
+                    return NotFound();
+                }
+
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                return Problem("An error occurred while updating the user.");
+            }
         }
 
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            bool result = UserDbRepository.Delete(id);
-
-            if (result == false)
+            try
             {
-                return NotFound();
-            }
+                bool result = userDbRepository.Delete(id);
 
-            return NoContent();
+                if (result == false)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Problem("An error occurred while deleting the user.");
+            }
         }
     }
 }
