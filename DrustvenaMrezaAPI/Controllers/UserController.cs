@@ -19,12 +19,22 @@ namespace DrustvenaMrezaAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<User>> GetAll()
+        public ActionResult GetPaged([FromQuery] int pageSize = 3, [FromQuery] int page = 1)
         {
+            if (pageSize < 1 ||  page < 1)
+            {
+                return BadRequest("Page and PageSize must be greater than zero.");
+            }
             try
             {
-                List<User> users = userDbRepository.GetAll();
-                return Ok(users);
+                List<User> users = userDbRepository.GetPaged(pageSize, page);
+                int totalCount = userDbRepository.CountAll();
+                Object result = new
+                {
+                    Data = users,
+                    TotalCount = totalCount
+                };
+                return Ok(result);
             }
             catch (Exception ex)
             {
